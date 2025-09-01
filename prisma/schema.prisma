@@ -11,10 +11,9 @@ datasource db {
 model Photo {
   id                 Int         @id @default(autoincrement())
   link               String      @unique
-  leaderboard        Leaderboard @relation(fields: [leaderboardId], references: [id])
-  leaderboardId      Int
   characters         Character[]
   charactersPosition Position[]
+  scores             Score[]
 }
 
 model Character {
@@ -42,20 +41,14 @@ model User {
   scores Score[]
 }
 
-model Leaderboard {
-  id     Int     @id @default(autoincrement())
-  photos Photo[]
-  scores Score[]
-}
-
 model Score {
-  id            Int         @id @default(autoincrement())
-  startTime     DateTime
-  endTime       DateTime
-  user          User        @relation(fields: [userId], references: [id])
-  userId        Int
-  leaderboard   Leaderboard @relation(fields: [leaderboardId], references: [id])
-  leaderboardId Int
+  id        Int      @id @default(autoincrement())
+  startTime DateTime
+  endTime   DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  photo     Photo    @relation(fields: [photoId], references: [id])
+  photoId   Int
 
-  @@unique([userId, leaderboardId])
+  @@unique([userId, photoId])
 }
