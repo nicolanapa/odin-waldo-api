@@ -7,3 +7,55 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model Photo {
+  id                 Int         @id @default(autoincrement())
+  link               String      @unique
+  leaderboard        Leaderboard @relation(fields: [leaderboardId], references: [id])
+  leaderboardId      Int
+  characters         Character[]
+  charactersPosition Position[]
+}
+
+model Character {
+  id           Int        @id @default(autoincrement())
+  name         String     @unique
+  insidePhotos Photo[]
+  positions    Position[]
+}
+
+model Position {
+  id          Int       @id @default(autoincrement())
+  horizontal  Int
+  vertical    Int
+  character   Character @relation(fields: [characterId], references: [id])
+  characterId Int
+  photo       Photo     @relation(fields: [photoId], references: [id])
+  photoId     Int
+
+  @@unique([characterId, photoId])
+}
+
+model User {
+  id     Int     @id @default(autoincrement())
+  name   String  @default("anon")
+  scores Score[]
+}
+
+model Leaderboard {
+  id     Int     @id @default(autoincrement())
+  photos Photo[]
+  scores Score[]
+}
+
+model Score {
+  id            Int         @id @default(autoincrement())
+  startTime     DateTime
+  endTime       DateTime
+  user          User        @relation(fields: [userId], references: [id])
+  userId        Int
+  leaderboard   Leaderboard @relation(fields: [leaderboardId], references: [id])
+  leaderboardId Int
+
+  @@unique([userId, leaderboardId])
+}
