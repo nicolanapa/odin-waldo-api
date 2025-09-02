@@ -2,7 +2,7 @@ import express from "express";
 import process from "process";
 import session from "express-session";
 import passport from "passport";
-import postRouter from "./routes/postRouter.js";
+import photoRouter from "./routes/photoRouter.js";
 
 const PORT = process.env.PORT || 3000;
 
@@ -22,6 +22,6 @@ app.get("/", (req, res) => {
     res.send("/");
 });
 
-app.use("/post", postRouter);
+app.use("/photo", photoRouter);
 
 app.listen(PORT);
