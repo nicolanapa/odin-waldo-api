@@ -17,10 +17,11 @@ model Photo {
 }
 
 model Character {
-  id           Int        @id @default(autoincrement())
-  name         String     @unique
-  insidePhotos Photo[]
-  positions    Position[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  insidePhoto Photo      @relation(fields: [photoId], references: [id])
+  photoId     Int
+  positions   Position[]
 }
 
 model Position {
