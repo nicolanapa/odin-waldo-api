@@ -20,7 +20,11 @@ const positionValidation = [
 const photoRouter = new Router();
 
 photoRouter.get("/", async (req, res) => {
-    return res.json(await prisma.photo.findMany({ select: { id: true } }));
+    let photoIds = await prisma.photo.findMany({ select: { id: true } });
+
+    photoIds = photoIds.map((id) => id.id);
+
+    return res.json(photoIds);
 });
 
 photoRouter.post("/", async (req, res) => {});
