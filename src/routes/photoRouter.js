@@ -39,6 +39,7 @@ photoRouter.get("/:id", async (req, res) => {
             link: true,
             characters: {
                 select: {
+                    id: true,
                     name: true,
                 },
             },
@@ -48,13 +49,6 @@ photoRouter.get("/:id", async (req, res) => {
     if (!photoElement) {
         return res.status(404).json({ error: "404 Not Found" });
     }
-
-    photoElement = {
-        ...photoElement,
-        characters: photoElement.characters.map(
-            (character) => character["name"],
-        ),
-    };
 
     return res.json(photoElement);
 });
