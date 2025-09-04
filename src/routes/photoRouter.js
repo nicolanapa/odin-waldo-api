@@ -1,6 +1,8 @@
 import { Router } from "express";
 import prisma from "../db/prisma.js";
 import { body, validationResult } from "express-validator";
+import process from "process";
+import jwt from "jsonwebtoken";
 
 const positionValidation = [
     body("horizontal")
@@ -122,9 +124,19 @@ photoRouter.post(
     },
 );
 
-photoRouter.post("/:id/start", async (req, res) => {});
+photoRouter.post("/:id/start", async (req, res) => {
+    const token = jwt.sign(
+        { startTime: new Date(), postId: parseInt(req.params.id), ip: req.ip },
+        process.env.JWT_PRIVATE_KEY,
+        { expiresIn: "5m" },
+    );
 
-photoRouter.post("/:id/end", async (req, res) => {});
+    res.status(200).json({ jwt: token });
+});
+
+photoRouter.post("/:id/end", async (req, res) => {
+    console.log(req.header("Authorization"));
+});
 
 photoRouter.post("/:id/confirm", async (req, res) => {});
 
