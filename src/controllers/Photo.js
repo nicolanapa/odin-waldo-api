@@ -79,6 +79,8 @@ class Photo {
     );*/
     }
 
+    // Rework this Path; Lock this path behind a JWT gotten from POST /:id/start
+    // Throw a 400 Error if there's a endTime key
     async postCheckPosition(req, res) {
         const errors = validationResult(req);
 
@@ -121,7 +123,7 @@ class Photo {
                 : { error: "JWT may be wrong or has expired" },
         );
     }
-    // check if all keys exist
+
     async postIdConfirm(req, res) {
         const errors = validationResult(req);
 
