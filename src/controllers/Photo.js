@@ -2,6 +2,7 @@ import { validationResult } from "express-validator";
 import process from "process";
 import jwt from "jsonwebtoken";
 import prisma from "../db/prisma.js";
+import jwtChecker from "../scripts/JwtChecker.js";
 
 class Photo {
     async getAll(req, res) {
@@ -104,70 +105,31 @@ class Photo {
     }
 
     async postIdStart(req, res) {
-        const token = jwt.sign(
-            {
-                startTime: new Date(),
-                postId: parseInt(req.params.id),
-                ip: req.ip,
-            },
-            process.env.JWT_PRIVATE_KEY,
-            { expiresIn: "5m" },
-        );
-
-        res.status(200).json({ jwt: token });
+        res.status(200).json({ jwt: jwtChecker.create(req) });
     }
 
     async postIdEnd(req, res) {
-        console.log(req.header("Authorization"));
+        const token = jwtChecker.verify(req);
 
-        if (!req.header("Authorization").startsWith("Bearer ")) {
-            return res
-                .status(400)
-                .json({ error: "JWT may be wrong or has expired" });
-        }
+        const finalToken = token
+            ? jwtChecker.update(req, { endTime: new Date() })
+            : false;
 
-        let token = req.header("Authorization").substring(7);
-        let decodedJwt = null;
-
-        try {
-            decodedJwt = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
-        } catch (err) {
-            return res
-                .status(400)
-                .json({ error: "JWT may be wrong or has expired" });
-        }
-
-        console.log(decodedJwt);
-
-        if (
-            decodedJwt.ip !== req.ip ||
-            decodedJwt.postId !== parseInt(req.params.id)
-        ) {
-            return res
-                .status(400)
-                .json({ error: "JWT may be wrong or has expired" });
-        }
-
-        let finalJwt = {
-            startTime: decodedJwt.startTime,
-            endTime: new Date(),
-            postId: decodedJwt.postId,
-            ip: decodedJwt.ip,
-        };
-
-        finalJwt = jwt.sign(finalJwt, process.env.JWT_PRIVATE_KEY, {
-            expiresIn: "5m",
-        });
-
-        res.status(200).json(finalJwt);
+        res.status(finalToken ? 200 : 400).json(
+            finalToken
+                ? { jwt: finalToken }
+                : { error: "JWT may be wrong or has expired" },
+        );
     }
-
+    // check if all keys exist
     async postIdConfirm(req, res) {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+
+        console.log(jwt.decode(req.header("Authorization").substring(7)));
     }
 }
 
