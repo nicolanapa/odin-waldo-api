@@ -129,7 +129,26 @@ class Photo {
             return res.status(400).json({ errors: errors.array() });
         }
 
-        console.log(jwt.decode(req.header("Authorization").substring(7)));
+        const token = jwtChecker.verify(req);
+
+        let name = "anon";
+        if (req?.body?.name !== undefined) {
+            name = req.body.name;
+        }
+
+        const finalTokenObject = token ? { ...token, name } : false;
+
+        if (finalTokenObject) {
+            console.log(finalTokenObject);
+
+            // Add Score to DB, after having verified everything
+        }
+
+        res.status(finalTokenObject ? 200 : 400).json(
+            finalTokenObject
+                ? true
+                : { error: "JWT may be wrong or has expired" },
+        );
     }
 }
 
