@@ -3,11 +3,17 @@ import jwt from "jsonwebtoken";
 
 class JwtChecker {
     create(req, overwrite = false) {
+        if (overwrite) {
+            delete overwrite.iat;
+            delete overwrite.exp;
+        }
+
         const token = jwt.sign(
             overwrite === false
                 ? {
                       startTime: new Date(),
                       postId: parseInt(req.params.id),
+                      characters: [],
                       ip: req.ip,
                   }
                 : overwrite,
@@ -18,8 +24,8 @@ class JwtChecker {
         return token;
     }
 
-    update(req, objectToAdd, postIdKey = "id") {
-        let token = this.verify(req, postIdKey);
+    update(req, objectToAdd, photoIdKey = "id") {
+        let token = this.verify(req, photoIdKey);
 
         if (!token) {
             return token;
@@ -36,7 +42,7 @@ class JwtChecker {
         return this.create(req, token);
     }
 
-    verify(req, postIdKey = "id") {
+    verify(req, photoIdKey = "id") {
         console.log(req.header("Authorization"));
 
         if (!req.header("Authorization").startsWith("Bearer ")) {
@@ -56,7 +62,7 @@ class JwtChecker {
 
         if (
             decodedJwt.ip !== req.ip ||
-            decodedJwt.postId !== parseInt(req.params[postIdKey])
+            decodedJwt.postId !== parseInt(req.params[photoIdKey])
         ) {
             return false;
         }
