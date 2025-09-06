@@ -148,7 +148,6 @@ class Photo {
         );
     }
 
-    // Check if all characterIds are in the JWT
     async postIdConfirm(req, res) {
         const errors = validationResult(req);
 
@@ -163,12 +162,56 @@ class Photo {
             name = req.body.name;
         }
 
-        const finalTokenObject = token ? { ...token, name } : false;
+        let finalTokenObject = token ? { ...token, name } : false;
 
         if (finalTokenObject) {
             console.log(finalTokenObject);
 
-            // Add Score to DB, after having verified everything
+            if (
+                !finalTokenObject.startTime ||
+                !finalTokenObject.endTime ||
+                finalTokenObject.characters.length === 0
+            ) {
+                finalTokenObject = false;
+            }
+
+            const characterPositions = await prisma.position.findMany({
+                where: {
+                    photoId: parseInt(req.params.id),
+                },
+            });
+
+            for (let i = 0; i < characterPositions.length; i++) {
+                if (
+                    !finalTokenObject.characters.includes(
+                        characterPositions[i].characterId,
+                    )
+                ) {
+                    finalTokenObject = false;
+
+                    break;
+                }
+            }
+
+            if (finalTokenObject !== false) {
+                const user = await prisma.user.create({
+                    select: {
+                        id: true,
+                    },
+                    data: {
+                        name: finalTokenObject.name,
+                    },
+                });
+
+                await prisma.score.create({
+                    data: {
+                        startTime: finalTokenObject.startTime,
+                        endTime: finalTokenObject.endTime,
+                        userId: user.id,
+                        photoId: parseInt(req.params.id),
+                    },
+                });
+            }
         }
 
         res.status(finalTokenObject ? 200 : 400).json(
