@@ -79,13 +79,19 @@ class Photo {
     );*/
     }
 
-    // Rework this Path; Lock this path behind a JWT gotten from POST /:id/start
-    // Throw a 400 Error if there's a endTime key
     async postCheckPosition(req, res) {
         const errors = validationResult(req);
 
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
+        }
+
+        const token = jwtChecker.verify(req, "photoId");
+
+        if (!token || token?.endTime) {
+            return res
+                .status(400)
+                .json({ error: "JWT may be wrong or has expired" });
         }
 
         const characterPosition = await prisma.position.findFirst({
@@ -100,10 +106,28 @@ class Photo {
         console.log(parseInt(req.params.photoId), characterPosition);
 
         if (!characterPosition) {
-            return res.status(404).json(false);
+            return res.status(404).json({ result: false });
         }
 
-        res.status(200).json(true);
+        let finalToken = null;
+        if (
+            !token.characters.includes(parseInt(characterPosition.characterId))
+        ) {
+            finalToken = jwtChecker.update(
+                req,
+                {
+                    characters: token.characters.concat(
+                        parseInt(characterPosition.characterId),
+                    ),
+                },
+                "photoId",
+            );
+        }
+
+        res.status(200).json({
+            jwt: !finalToken ? jwtChecker.create(req, token) : finalToken,
+            result: true,
+        });
     }
 
     async postIdStart(req, res) {
@@ -124,6 +148,7 @@ class Photo {
         );
     }
 
+    // Check if all characterIds are in the JWT
     async postIdConfirm(req, res) {
         const errors = validationResult(req);
 
