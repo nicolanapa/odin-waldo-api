@@ -1,6 +1,4 @@
 import { validationResult } from "express-validator";
-import process from "process";
-import jwt from "jsonwebtoken";
 import prisma from "../db/prisma.js";
 import jwtChecker from "../scripts/JwtChecker.js";
 
