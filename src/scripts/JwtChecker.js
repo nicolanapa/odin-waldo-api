@@ -18,7 +18,7 @@ class JwtChecker {
                   }
                 : overwrite,
             process.env.JWT_PRIVATE_KEY,
-            { expiresIn: "5m" },
+            { expiresIn: "7.5m" },
         );
 
         return token;
