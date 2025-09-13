@@ -1,22 +1,20 @@
 import express from "express";
+import cors from "cors";
 import process from "process";
-import session from "express-session";
-import passport from "passport";
 import photoRouter from "./routes/photoRouter.js";
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
 
+app.use(express.urlencoded({ extended: true }));
+
 app.use(
-    session({
-        secret: process.env.SECRET_SESSION,
-        resave: false,
-        saveUninitialized: false,
+    cors({
+        origin: process.env.FRONTEND_URL,
+        methods: ["GET", "POST"],
     }),
 );
-app.use(passport.session());
-app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
     res.send("/");
