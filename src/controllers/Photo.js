@@ -94,8 +94,14 @@ class Photo {
 
         const characterPosition = await prisma.position.findFirst({
             where: {
-                horizontal: parseInt(req.body.horizontal),
-                vertical: parseInt(req.body.vertical),
+                horizontal: {
+                    gte: parseInt(req.body.horizontal) - 5,
+                    lte: parseInt(req.body.horizontal) + 5,
+                },
+                vertical: {
+                    gte: parseInt(req.body.vertical) - 5,
+                    lte: parseInt(req.body.vertical) + 5,
+                },
                 photoId: parseInt(req.params.photoId),
                 characterId: parseInt(req.params.characterId),
             },
