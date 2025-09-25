@@ -126,6 +126,8 @@ class Photo {
                 },
                 "photoId",
             );
+
+            console.log("postCheckPosition Decoded JWT", finalToken);
         }
 
         res.status(200).json({
@@ -140,6 +142,8 @@ class Photo {
 
     async postIdEnd(req, res) {
         const token = jwtChecker.verify(req);
+
+        console.log("postIdEnd JWT", token);
 
         const finalToken = token
             ? jwtChecker.update(req, { endTime: new Date() })
@@ -169,7 +173,7 @@ class Photo {
         let finalTokenObject = token ? { ...token, name } : false;
 
         if (finalTokenObject) {
-            console.log(finalTokenObject);
+            console.log("postIdConfirm", finalTokenObject);
 
             if (
                 !finalTokenObject.startTime ||

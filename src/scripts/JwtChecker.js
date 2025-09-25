@@ -39,11 +39,13 @@ class JwtChecker {
             ...objectToAdd,
         };
 
+        console.log("Updated Token", token);
+
         return this.create(req, token);
     }
 
     verify(req, photoIdKey = "id") {
-        console.log(req.header("Authorization"));
+        console.log("Verify JWT", req.header("Authorization"));
 
         if (!req.header("Authorization").startsWith("Bearer ")) {
             return false;
@@ -58,7 +60,7 @@ class JwtChecker {
             return false;
         }
 
-        console.log(decodedJwt);
+        console.log("Verified Decoded JWT", decodedJwt);
 
         if (
             decodedJwt.ip !== req.ip ||
