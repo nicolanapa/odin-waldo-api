@@ -45,8 +45,6 @@ class JwtChecker {
     }
 
     verify(req, photoIdKey = "id") {
-        console.log("Verify JWT", req.header("Authorization"));
-
         if (!req.header("Authorization").startsWith("Bearer ")) {
             return false;
         }
@@ -59,8 +57,6 @@ class JwtChecker {
         } catch {
             return false;
         }
-
-        console.log("Verified Decoded JWT", decodedJwt);
 
         if (
             decodedJwt.ip !== req.ip ||
