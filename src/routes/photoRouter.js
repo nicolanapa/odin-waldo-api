@@ -30,7 +30,7 @@ const photoRouter = new Router();
 
 photoRouter.get("/", photoController.getAll);
 
-photoRouter.post("/", photoController.postPhoto);
+// photoRouter.post("/", photoController.postPhoto);
 
 photoRouter.get("/:id", photoController.getId);
 
